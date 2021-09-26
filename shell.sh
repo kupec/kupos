@@ -1,5 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
+source docker.inc
+
 docker build -t kupos .
-docker run --rm -it -v "$PWD:/kupos" kupos bash
+docker run $DOCKER_FLAGS -it kupos bash
