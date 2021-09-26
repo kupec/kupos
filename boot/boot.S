@@ -1,8 +1,8 @@
-fat_boot_start = 0x3e
+.include "boot/code_opts.inc"
 
 .text
 .code16
-. = fat_boot_start
+. = BOOT_CODE_START
 
 /* setup segment registers and stack */
 boot:
@@ -30,8 +30,3 @@ temp_sz = . - temp
 /* load main kernel to memory */
 
 /* TODO */
-
-/* end of sector */
-. = 0x200-2
-.byte 0x55
-.byte 0xaa

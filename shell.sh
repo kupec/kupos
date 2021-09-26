@@ -2,4 +2,4 @@
 set -e
 
 docker build -t kupos .
-docker run -it -v "$PWD:/kupos" kupos bash
+docker run --rm -it -v "$PWD:/kupos" kupos bash
