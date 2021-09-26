@@ -1,7 +1,11 @@
+fat_boot_start = 0x3e
+
 .text
 .code16
+. = fat_boot_start
 
 /* setup segment registers and stack */
+boot:
 	jmpl $0x07c0,$right_seg
 right_seg:
 	movw %cs, %ax
@@ -27,9 +31,7 @@ temp_sz = . - temp
 
 /* TODO */
 
-
-
-/* end of boot sector */
-. = 0x200 - 2
+/* end of sector */
+. = 0x200-2
 .byte 0x55
 .byte 0xaa
