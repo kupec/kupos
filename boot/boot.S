@@ -1,5 +1,8 @@
 .include "boot/code_opts.inc"
 
+/* TODO: replace hardcoded value by the value from mbr */
+PARTITION_FIRST_SECTOR = 1
+
 BPB_BYTES_PER_SECTOR = 0xb
 BPB_SECTOR_PER_CLUSTER = 0xd
 BPB_RESERVED_SECTORS = 0xe
@@ -7,7 +10,6 @@ BPB_FAT_COUNT = 0x10
 BPB_DIR_ENTRY_COUNT = 0x11
 BPB_FAT_SECTORS = 0x16
 
-DRIVE = 0x0 /* TODO: replace to 0x80 */
 STACK_SEG = 0x7c0
 SECTOR_SEG = 0x7e0
 MAIN_SEG = 0x800
@@ -32,7 +34,6 @@ KERNEL_START_SEG = 0x1000
 
 boot:
 	/* use initial boot sector as stack, copy code to next 0x200 bytes */
-	cli
 	movw $STACK_SEG, %ax
 	movw %ax, %ds
 	movw %ax, %ss
@@ -51,9 +52,9 @@ boot2:
 	movw %ax, %ds
 	movw %ax, %es
 
-	/* find kernel file */
-	sti
+	movb %dl, drive
 
+	/* find kernel file */
 	movw $sSearchingKernel, %si
 	call print_line
 
@@ -61,7 +62,7 @@ reset_io:
 	xorw $ax, %ax
 	int $0x13
 	movb $8, %ah
-	movb $DRIVE, %dl
+	movb drive, %dl
 	int $0x13
 	jc reset_io
 
@@ -77,6 +78,7 @@ reset_io:
 	movzbw BPB_FAT_COUNT, %dx
 	mulw %dx
 	addw BPB_RESERVED_SECTORS, %ax
+	addw $PARTITION_FIRST_SECTOR, %ax
 	movw %ax, root_dir_sector_offset
 	movw %ax, %bx
 	movw BPB_DIR_ENTRY_COUNT, %bp
@@ -148,6 +150,7 @@ read_cluster:
 	movw %dx, %di
 
 	movw BPB_RESERVED_SECTORS, %bx
+	addw $PARTITION_FIRST_SECTOR, %bx
 	addw %ax, %bx
 	movw $SECTOR_SEG, %ax
 	movw %ax, %es
@@ -167,26 +170,7 @@ read_cluster:
 run_kernel:
 	jmpl $KERNEL_START_SEG,$0
 
-
-/*
-	print line:
-	ds:si - string
- */
-print_line:
-	pushw %ax
-	pushw %bx
-1:
-	lodsb
-	test %al, %al
-	jz 1f
-	movb $0x0e, %ah
-	movb $0x03, %bl
-	int $0x10
-	jmp 1b
-1:
-	popw %bx
-	popw %ax
-	ret
+.include "boot/boot.inc"
 
 /*
 	read sector:
@@ -209,7 +193,7 @@ read_sector:
 	xorw %dx, %dx
 	divw head_per_track
 	movb %dl, %dh
-	movb $DRIVE, %dl
+	movb drive, %dl
 
 	/* LBA -> CHS - C part */
 	movb %al, %ch
@@ -229,6 +213,7 @@ sSearchingKernel: .asciz "Searching kernel...\r\n"
 sCannotFoundKernel: .asciz "Cannot found kernel.bin\r\n"
 sLoadingKernel: .asciz "Loading kernel...\r\n"
 
+drive: .byte 0
 sector_per_head: .word 0
 head_per_track: .word 0
 kernel_name: .ascii "KERNEL  BIN"
