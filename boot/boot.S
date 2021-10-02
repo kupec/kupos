@@ -59,7 +59,7 @@ boot2:
 	call print_line
 
 reset_io:
-	xorw $ax, %ax
+	xorw %ax, %ax
 	int $0x13
 	movb $8, %ah
 	movb drive, %dl

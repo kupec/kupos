@@ -13,7 +13,7 @@ boot/disk.img: boot/disk_opts.inc kernel/kernel.bin
 	bash scripts/generate_disk.sh $< $@
 
 %.bin: %.o
-	objcopy --dump-section .text=$@ $<
+	ld -m elf_i386 -Ttext 0 --entry 0 --oformat binary -o $@ $<
 
 boot/mbr.o: boot/mbr.s boot/boot.inc
 	gcc -m16 -nostdlib -c -o $@ $<
