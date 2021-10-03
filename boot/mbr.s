@@ -71,6 +71,6 @@ no_boot_partition:
 	call print_line
 	jmp .
 	
-.include "boot/boot.inc"
+.include "boot.inc"
 
 sNoBootPartition: .ascii "No boot partition found\r\n"

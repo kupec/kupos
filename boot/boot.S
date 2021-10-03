@@ -1,4 +1,5 @@
-.include "boot/code_opts.inc"
+.include "code_opts.inc"
+.include "../kernel/kernel.inc"
 
 /* TODO: replace hardcoded value by the value from mbr */
 PARTITION_FIRST_SECTOR = 1
@@ -26,7 +27,7 @@ FAT_ENTRY_SIZE = 2
 FAT_ENTRY_PER_SECTOR = SECTOR_SIZE / FAT_ENTRY_SIZE
 FAT_EOF = 0xfff8
 
-KERNEL_START_SEG = 0x1000
+KERNEL_START_SEG = KERNEL_START / 0x10
 
 .text
 .code16
@@ -170,7 +171,7 @@ read_cluster:
 run_kernel:
 	jmpl $KERNEL_START_SEG,$0
 
-.include "boot/boot.inc"
+.include "boot.inc"
 
 /*
 	read sector:
