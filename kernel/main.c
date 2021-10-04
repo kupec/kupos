@@ -1,5 +1,7 @@
+#include "console.h"
+
 void kernel_main() {
-    char *video = (char *)0xb8000;
-    video[0] = '!';
+    puts("Protected mode initialized");
+
     for (;;);
 }
