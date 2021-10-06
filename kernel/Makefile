@@ -1,6 +1,6 @@
 include kernel.inc
 
-CFLAGS = -m32 -nostdlib -fno-pic -Wno-builtin-declaration-mismatch
+CFLAGS = -m32 -nostdlib -fno-pic
 objects = main.o console.o
 
 .PHONY: all
@@ -22,7 +22,7 @@ prot.o: prot.s
 	gcc -m32 -nostdlib -c -o $@ $<
 
 main.o: main.c console.h string.h
-console.o: console.c
+console.o: console.c math.h console.h string.h
 
 .PHONY: clean
 clean:

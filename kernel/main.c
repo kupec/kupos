@@ -1,7 +1,7 @@
 #include "console.h"
 
 void kernel_main() {
-    puts("Protected mode initialized");
+    console_print_line("Protected mode initialized");
 
     for (;;);
 }
