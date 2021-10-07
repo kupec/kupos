@@ -22,7 +22,7 @@ prot.o: prot.s
 	gcc -m32 -nostdlib -c -o $@ $<
 
 main.o: main.c console.h string.h
-console.o: console.c math.h console.h string.h
+console.o: console.c math.h console.h string.h asm/io.h types/types.h
 
 .PHONY: clean
 clean:
