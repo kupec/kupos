@@ -12,11 +12,9 @@ parted -s "$OUTPUT" -- \
     set 1 boot on
 mkfs.fat --offset 1 -F 16 "$OUTPUT"
 
-# TODO: delete it
-# add garbage files
+# TODO: move it to another script
 mkdir -p build/temp
 mount -o offset=512 "$OUTPUT" build/temp
-cp files/* build/temp
-cp kernel/* build/temp
+cp kernel/kernel.bin build/temp
 umount build/temp
 
