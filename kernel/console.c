@@ -6,7 +6,9 @@
 #define PAGE_WIDTH 80
 #define PAGE_HEIGHT 25
 #define PAGE_SIZE (PAGE_WIDTH * PAGE_HEIGHT)
-#define VIDEO_BUFFER 0xb8000
+#define VIDEO_BUFFER (uint16 *)0xb8000
+
+#define WHITE_ON_BLACK 0x07
 
 #define CRT_REG_PORT 0x3d4
 #define CRT_VAL_PORT 0x3d5
@@ -27,15 +29,11 @@ void console_set_cursor(uint16 row, uint16 col) {
 }
 
 void console_get_cursor(uint16 *row, uint16 *col) {
-    uint16 offset = 0;
-    uint16 offset_hi = 0;
-
     outb(CRT_REG_PORT, CRT_CURSOR_POS_REG_HI);
-    inb(CRT_VAL_PORT, offset_hi);
+    uint8 offset_hi = inb(CRT_VAL_PORT);
     outb(CRT_REG_PORT, CRT_CURSOR_POS_REG_LO);
-    inb(CRT_VAL_PORT, offset);
+    uint16 offset = WORD(offset_hi, inb(CRT_VAL_PORT));
 
-    offset += offset_hi << 8;
     offset -= current_page * PAGE_SIZE;
 
     *row = offset / PAGE_WIDTH;
@@ -54,7 +52,14 @@ void console_select_page(uint page) {
 }
 
 uint16 *get_video_page_ptr(uint page) {
-    return VIDEO_BUFFER + page * PAGE_SIZE * 2;
+    return VIDEO_BUFFER + page * PAGE_SIZE;
+}
+
+void console_clear_screen(uint page) {
+    uint16* buffer = get_video_page_ptr(page);
+    for (int i = 0; i < PAGE_SIZE; i++) {
+        buffer[i] = WORD(WHITE_ON_BLACK, ' ');
+    }
 }
 
 void console_print_line(char* s) {
@@ -70,9 +75,7 @@ void console_print_line(char* s) {
     uint16* current_buffer = get_video_page_ptr(current_page);
     uint16* next_buffer = get_video_page_ptr(next_page);
 
-    for (int i = 0; i < PAGE_SIZE; i++) {
-        next_buffer[i] = 0x0720;
-    }
+    console_clear_screen(next_page);
     for (int i = start_pos; i < end_pos; i++) {
         next_buffer[i - start_pos] = current_buffer[i];
     } 
