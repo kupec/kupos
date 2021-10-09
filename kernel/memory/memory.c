@@ -3,8 +3,9 @@
 #include "../asm/int.h"
 
 extern uint32 KERNEL_START;
-extern uint32 PAGE_STRUCTURES_ADDR;
+extern uint32 KERNEL_SIZE;
 
+#define PAGE_STRUCTURES_ADDR ((uint32*)((void*)&KERNEL_START + (uint32)&KERNEL_SIZE))
 #define ENTRY_COUNT 1024
 #define PAGE_SIZE 0x1000
 
@@ -20,7 +21,7 @@ void enable_paging(void *page_dir) {
 }
 
 uint32 *get_page_dir_ptr() {
-    return &PAGE_STRUCTURES_ADDR;
+    return PAGE_STRUCTURES_ADDR;
 }
 
 void memory_cache_invalidate(void *page) {

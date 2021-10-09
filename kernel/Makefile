@@ -1,5 +1,6 @@
 include kernel.inc
 
+CC = gcc
 CFLAGS = -m32 -nostdlib -fno-pic
 objects = main.o console.o memory/memory.o asm/int.o
 
@@ -12,8 +13,8 @@ kernel.bin: mode16.bin main.bin
 mode16.bin: mode16.o
 	ld -m elf_i386 -Ttext 0 --entry 0 --defsym KERNEL_ENTRYPOINT=$(KERNEL_ENTRYPOINT) --oformat binary -o $@ $<
 
-main.bin: prot.o $(objects)
-	ld -m elf_i386 -Ttext $(KERNEL_ENTRYPOINT) --entry 0 --defsym KERNEL_START=$(KERNEL_START) --defsym PAGE_STRUCTURES_ADDR=$(PAGE_STRUCTURES_ADDR) --oformat binary -shared -fno-pie -o $@ $^
+main.bin: build.ld prot.o $(objects)
+	ld -m elf_i386 -shared -fno-pie -o $@ -T $^
 
 mode16.o: mode16.s ../boot/boot.inc
 	gcc -m16 -nostdlib -c -o $@ $<
