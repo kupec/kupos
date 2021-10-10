@@ -25,7 +25,9 @@ prot.o: prot.s
 main.o: main.c console.h string.h memory/memory.h
 console.o: console.c math.h console.h string.h asm/io.h types/types.h
 memory/memory.o: memory/memory.c memory/memory.h types/types.h asm/int.h
-asm/int.o: asm/int.c asm/int.h
+
+asm/int.o: asm/int.rs
+	rustc --emit=obj -O --crate-type=lib -C relocation-model=static -o $@ $<
 
 .PHONY: clean
 clean:
