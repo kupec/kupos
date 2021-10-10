@@ -7,14 +7,8 @@ KERNEL_ENTRYPOINT = 0x11000;
 SECTIONS {
     .text KERNEL_ENTRYPOINT : {
         * (.text)
-    }
-    .rodata : {
         * (.rodata)
-    }
-    .data : {
         * (.data)
-    }
-    .bss : {
         * (.bss)
     }
     KERNEL_SIZE = ALIGN(0x1000) - KERNEL_START;

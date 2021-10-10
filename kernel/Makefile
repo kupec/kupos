@@ -1,7 +1,7 @@
 include kernel.inc
 
 CC = gcc
-CFLAGS = -m32 -nostdlib -fno-pic
+CFLAGS = -m32 -nostdlib -fno-pic -fno-asynchronous-unwind-tables
 objects = main.o console.o memory/memory.o asm/int.o
 
 .PHONY: all
@@ -29,4 +29,4 @@ asm/int.o: asm/int.c asm/int.h
 
 .PHONY: clean
 clean:
-	rm -rf *.o *.bin
+	rm -rf **/*.o *.bin
