@@ -7,4 +7,5 @@ kernel_entry:
 	movw %ax, %es
 	movw %ax, %ss
 	movl $kernel_entry, %esp
+
 	jmp kernel_main
