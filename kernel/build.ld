@@ -1,9 +1,15 @@
 OUTPUT_FORMAT("binary")
+ENTRY("0")
+
+KERNEL_START = 0x10000;
+KERNEL_ENTRYPOINT = 0x11000;
+
 SECTIONS {
-    .text 0 : {
+    .text KERNEL_ENTRYPOINT : {
         * (.text)
+        * (.rodata)
+        * (.data)
+        * (.bss)
     }
-    .prot 0x10000 : {
-        * (.prot)
-    }
+    KERNEL_SIZE = ALIGN(0x1000) - KERNEL_START;
 }
