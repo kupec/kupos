@@ -31,4 +31,4 @@ asm/int.o: asm/int.rs
 
 .PHONY: clean
 clean:
-	rm -rf **/*.o *.bin
+	rm -rf **/*.o *.o *.bin
