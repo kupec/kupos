@@ -14,6 +14,8 @@ pub fn cli() {
 pub fn sti() {
     unsafe {
         CLI_COUNT -= 1;
-        asm!("sti");
+        if CLI_COUNT == 0 {
+            asm!("sti");
+        }
     }
 }
