@@ -2,15 +2,14 @@
 #include "../types/types.h"
 #include "../asm/int.h"
 
-extern uint32 KERNEL_START;
-extern uint32 KERNEL_SIZE;
+extern uint32 MEMORY_FREE_REAL_MEM_STACK;
+extern uint32 MEMORY_PAGE_STRUCTURES;
 
-#define PAGE_STRUCTURES_ADDR ((uint32*)((void*)&KERNEL_START + (uint32)&KERNEL_SIZE))
+#define PAGE_STRUCTURES_ADDR (&MEMORY_PAGE_STRUCTURES)
 #define ENTRY_COUNT 1024
 #define PAGE_SIZE 0x1000
+#define FREE_REAL_MEM_STACK_BUFFER (&MEMORY_FREE_REAL_MEM_STACK)
 #define FREE_REAL_MEM_STACK_CAPACITY (ENTRY_COUNT * ENTRY_COUNT)
-
-uint32 free_real_mem_stack_buffer[FREE_REAL_MEM_STACK_CAPACITY];
 
 typedef struct {
     uint32 *buffer;
@@ -19,7 +18,7 @@ typedef struct {
 } Stack;
 
 Stack free_real_mem_stack = {
-    .buffer = free_real_mem_stack_buffer,
+    .buffer = FREE_REAL_MEM_STACK_BUFFER,
     .top = 0,
     .capacity = FREE_REAL_MEM_STACK_CAPACITY
 };
@@ -116,15 +115,12 @@ void memory_init() {
     }
 
     void *ptr_after_page_tables = page_dir + (1 + ENTRY_COUNT) * ENTRY_COUNT;
-    for (void *ptr = &KERNEL_START; ptr < ptr_after_page_tables; ptr += PAGE_SIZE) {
+    for (void *ptr = 0; ptr < ptr_after_page_tables; ptr += PAGE_SIZE) {
         memory_map_page(ptr, ptr);
     }
 
     enable_paging(page_dir);
 
-    for (uint32 i = 0; i < KERNEL_START; i += PAGE_SIZE) {
-        stack_push(&free_real_mem_stack, i);
-    }
     for (uint32 i = (uint32)ptr_after_page_tables; i != 0; i += PAGE_SIZE) {
         stack_push(&free_real_mem_stack, i);
     }
