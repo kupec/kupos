@@ -1,1 +1,0 @@
-DISK_SIZE_IN_MB=10

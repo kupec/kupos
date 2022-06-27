@@ -24,6 +24,6 @@ fi;
 
 cp "$DISK_FILE" "$OUTPUT.bak"
 dd bs=1 if="$MBR_SECTOR" of="$OUTPUT.bak" conv=notrunc
-let "SEEK = SKIP_BYTES + 512"
+let "SEEK = SKIP_BYTES + $BOOT_SECTOR_LBA * 512"
 dd bs=1 if="$BOOT_SECTOR" skip="$SKIP_BYTES" of="$OUTPUT.bak" seek="$SEEK" conv=notrunc
 mv "$OUTPUT.bak" "$OUTPUT"
