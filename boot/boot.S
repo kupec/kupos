@@ -1,8 +1,5 @@
-.include "code_opts.inc"
+.include "opts.inc"
 .include "../kernel/kernel.inc"
-
-/* TODO: replace hardcoded value by the value from mbr */
-PARTITION_FIRST_SECTOR = 1
 
 BPB_BYTES_PER_SECTOR = 0xb
 BPB_SECTOR_PER_CLUSTER = 0xd
@@ -35,10 +32,13 @@ KERNEL_START_SEG = KERNEL_START / 0x10
 
 boot:
 	/* use initial boot sector as stack, copy code to next 0x200 bytes */
-	movw $STACK_SEG, %ax
-	movw %ax, %ds
-	movw %ax, %ss
+	movw $STACK_SEG, %bx
+	movw %bx, %ds
+	movw %bx, %ss
 	movw $SECTOR_SIZE, %sp
+
+	movw %ax, partition_first_sector
+
 	movw $MAIN_SEG, %ax
 	movw %ax, %es
 	xorw %si, %si
@@ -53,24 +53,11 @@ boot2:
 	movw %ax, %ds
 	movw %ax, %es
 
-	movb %dl, drive
-
 	/* find kernel file */
 	movw $sSearchingKernel, %si
 	call print_line
 
-reset_io:
-	xorw %ax, %ax
-	int $0x13
-	movb $8, %ah
-	movb drive, %dl
-	int $0x13
-	jc reset_io
-
-	incb %dh
-	movb %dh, head_per_track
-	andb $0x3f, %cl
-	movb %cl, sector_per_head
+	call init_io
 
 	movw $SECTOR_SEG, %ax
 	movw %ax, %es
@@ -79,7 +66,7 @@ reset_io:
 	movzbw BPB_FAT_COUNT, %dx
 	mulw %dx
 	addw BPB_RESERVED_SECTORS, %ax
-	addw $PARTITION_FIRST_SECTOR, %ax
+	addw partition_first_sector, %ax
 	movw %ax, root_dir_sector_offset
 	movw %ax, %bx
 	movw BPB_DIR_ENTRY_COUNT, %bp
@@ -151,7 +138,7 @@ read_cluster:
 	movw %dx, %di
 
 	movw BPB_RESERVED_SECTORS, %bx
-	addw $PARTITION_FIRST_SECTOR, %bx
+	addw partition_first_sector, %bx
 	addw %ax, %bx
 	movw $SECTOR_SEG, %ax
 	movw %ax, %es
@@ -173,50 +160,11 @@ run_kernel:
 
 .include "boot.inc"
 
-/*
-	read sector:
-	bx - LBA (starting with 0)
-	es - the sector will be read to es:0
- */
-read_sector:
-	pushw %bx
-	pushw %cx
-	pushw %dx
+sSearchingKernel: .asciz "Find kernel\r\n"
+sCannotFoundKernel: .asciz "Not found kernel.bin\r\n"
+sLoadingKernel: .asciz "Load kernel\r\n"
 
-	/* LBA -> CHS - S part */
-	xorw %dx, %dx
-	movw %bx, %ax
-	divw sector_per_head
-	movw %dx, %cx
-	incw %cx
-
-	/* LBA -> CHS - H part */
-	xorw %dx, %dx
-	divw head_per_track
-	movb %dl, %dh
-	movb drive, %dl
-
-	/* LBA -> CHS - C part */
-	movb %al, %ch
-	shlb $6, %ah
-	orb %ah, %cl
-
-	movw $0x0201, %ax
-	xorw %bx, %bx
-	int $0x13
-
-	popw %dx
-	popw %cx
-	popw %bx
- 	ret
-
-sSearchingKernel: .asciz "Searching kernel...\r\n"
-sCannotFoundKernel: .asciz "Cannot found kernel.bin\r\n"
-sLoadingKernel: .asciz "Loading kernel...\r\n"
-
-drive: .byte 0
-sector_per_head: .word 0
-head_per_track: .word 0
+partition_first_sector: .word 0
 kernel_name: .ascii "KERNEL  BIN"
 root_dir_sector_offset: .word 0
 kernel_cluster_seg: .word KERNEL_START_SEG

@@ -4,9 +4,7 @@ STACK_SEG = 0x800
 
 PART_TABLE = 0x1be
 PART_ENTRY_STATUS = 0
-PART_ENTRY_HEAD = 1
-PART_ENTRY_SECTOR = 2
-PART_ENTRY_CYL = 3
+PART_ENTRY_OFFSET_LBA = 8
 PART_ENTRY_SIZE = 16
 MAX_PART_COUNT = 4
 
@@ -36,9 +34,12 @@ start:
 	jmp $RELOC_SEG,$relocated
 
 relocated:
-	/* find bootable partition */
 	push %es
 	pop %ds
+
+	call init_io
+
+	/* find bootable partition */
 	movw $PART_TABLE, %si
 	movw $MAX_PART_COUNT, %cx
 
@@ -52,18 +53,17 @@ next_partition:
 	jmp next_partition
 
 load_boot_sector:
-	movb PART_ENTRY_HEAD(%si), %dh
-	movb PART_ENTRY_SECTOR(%si), %cl
-	movb PART_ENTRY_CYL(%si), %ch
-	xorw %bx, %bx
+	movw PART_ENTRY_OFFSET_LBA(%si), %bx
 	movw $BOOT_SEG, %ax
 	movw %ax, %es
-	movw $0x0201, %ax
-	int $0x13
+	call read_sector
+
+boot_sector_loaded:
+	movw %bx, %ax
 
 	pop %es
 	pop %di
-	pop %di
+	pop %dx
 	jmpl $BOOT_SEG,$0
 
 no_boot_partition:

@@ -2,4 +2,5 @@
 *.d
 *.img
 *.bin
+*.elf
 build/

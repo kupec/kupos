@@ -11,10 +11,10 @@ build_recursive:
 	make -C boot
 	make -C kernel
 
-$(KUPOS_IMG): build/disk.img boot/mbr.bin boot/boot.bin boot/code_opts.inc
+$(KUPOS_IMG): build/disk.img boot/mbr.bin boot/boot.bin boot/opts.inc
 	bash scripts/build_image.sh $^ $@
 
-build/disk.img: boot/disk_opts.inc kernel/kernel.bin
+build/disk.img: boot/opts.inc kernel/kernel.bin
 	bash scripts/generate_disk.sh $< $@
 
 .PHONY: clean
