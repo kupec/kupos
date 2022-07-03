@@ -96,7 +96,7 @@ int memory_map_page(void* virtual_ptr, void* real_ptr) {
     }
 
     uint32 *page_entry_ptr = get_page_table_entry_ptr(virtual_ptr);
-    *page_entry_ptr = real_addr + 0x001;
+    *page_entry_ptr = real_addr + 0x003;
 
     sti();
     return 0;
@@ -121,7 +121,7 @@ void memory_init() {
 
     enable_paging(page_dir);
 
-    for (uint32 i = (uint32)ptr_after_page_tables; i != 0; i += PAGE_SIZE) {
+    for (uint32 i = 0xfffff000; i >= (uint32)ptr_after_page_tables; i -= PAGE_SIZE) {
         stack_push(&free_real_mem_stack, i);
     }
 }
@@ -147,7 +147,7 @@ int find_free_pages(int count, void **out) {
         for (uint32 j = 0; j < ENTRY_COUNT; j++) {
             void *ptr = (void*)((i << 22) + (j << 12));
             uint32 *page_entry_ptr = get_page_table_entry_ptr(ptr);
-            if (*page_entry_ptr & 1 == 0) {
+            if (*page_entry_ptr & 1 == 1) {
                 found_page_count = 0;
             }
             else {

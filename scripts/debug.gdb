@@ -8,9 +8,8 @@ define real_mode
 end
 
 define prot_mode
-    break *0x11000
-    continue
     symbol-file kernel/main.elf
-    display/4i $pc
+    tbreak kernel_main
+    continue
 end
 
