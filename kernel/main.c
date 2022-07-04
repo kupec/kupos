@@ -9,7 +9,7 @@ void kernel_main() {
 
     console_print_line("Trying to allocate memory...");
     uint32 *ptr;
-    if (memory_alloc_pages(1, &ptr) < 0) {
+    if (memory_alloc_pages(1, (void*)&ptr) < 0) {
         console_print_line("Cannot allocate");
     }
     else {

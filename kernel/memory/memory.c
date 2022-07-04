@@ -147,7 +147,7 @@ int find_free_pages(int count, void **out) {
         for (uint32 j = 0; j < ENTRY_COUNT; j++) {
             void *ptr = (void*)((i << 22) + (j << 12));
             uint32 *page_entry_ptr = get_page_table_entry_ptr(ptr);
-            if (*page_entry_ptr & 1 == 1) {
+            if ((*page_entry_ptr & 1) == 1) {
                 found_page_count = 0;
             }
             else {
@@ -193,4 +193,6 @@ int memory_dealloc_pages(void* ptr, int count) {
         memory_unmap_page(ptr);
         ptr += PAGE_SIZE;
     }
+
+    return 0;
 }
