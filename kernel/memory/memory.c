@@ -2,9 +2,12 @@
 #include "../types/types.h"
 #include "../asm/int.h"
 
+extern uint32 KERNEL_ENTRYPOINT;
+extern uint32 KERNEL_SIZE;
 extern uint32 MEMORY_FREE_REAL_MEM_STACK;
 extern uint32 MEMORY_PAGE_STRUCTURES;
 
+#define KERNEL_END ((uint32)&KERNEL_ENTRYPOINT + (uint32)&KERNEL_SIZE)
 #define PAGE_STRUCTURES_ADDR (&MEMORY_PAGE_STRUCTURES)
 #define ENTRY_COUNT 1024
 #define PAGE_SIZE 0x1000
@@ -22,6 +25,8 @@ Stack free_real_mem_stack = {
     .top = 0,
     .capacity = FREE_REAL_MEM_STACK_CAPACITY
 };
+
+uint32 ram_size;
 
 int stack_push(Stack *stack, uint32 value) {
     if (stack->top == stack->capacity) {
@@ -64,6 +69,10 @@ void memory_cache_invalidate(void *page) {
     __asm__ volatile ("invlpg %0" :: "m" (page));
 }
 
+uint32 get_page_dir_length() {
+    return ram_size >> 22;
+}
+
 uint32 *get_page_table_entry_ptr(void* virtual_ptr) {
     cli();
 
@@ -96,16 +105,42 @@ int memory_map_page(void* virtual_ptr, void* real_ptr) {
     }
 
     uint32 *page_entry_ptr = get_page_table_entry_ptr(virtual_ptr);
-    *page_entry_ptr = real_addr + 0x001;
+    *page_entry_ptr = real_addr + 0x003;
 
     sti();
     return 0;
 }
 
-void memory_init() {
-    uint32 *page_dir = get_page_dir_ptr();
+void detect_ram_size() {
+    uint32 min = KERNEL_END;
+    uint32 max = 0xFFFFFFFF - (sizeof(uint32) - 1);
 
-    for (int i = 0; i < ENTRY_COUNT; i++) {
+    while (max - min >= sizeof(uint32)) {
+        uint32* c = min + (max - min) / 2;
+
+        uint32 old = *c;
+        uint32 new = old ^ 0xFFFFFFFF;
+        *c = new;
+        if (*c == new) {
+            min = c;
+        }
+        else {
+            max = c;
+        }
+
+        *c = old;
+    }
+
+    ram_size = (max + sizeof(uint32)) & 0xFFC00000;
+}
+
+void memory_init() {
+    detect_ram_size();
+
+    uint32 *page_dir = get_page_dir_ptr();
+    uint32 page_dir_length = get_page_dir_length();
+
+    for (int i = 0; i < page_dir_length; i++) {
         uint32 *page_table = (void*)page_dir + (i + 1) * PAGE_SIZE;
         page_dir[i] =  (uint32)page_table + 0x003;
 
@@ -114,14 +149,14 @@ void memory_init() {
         }
     }
 
-    void *ptr_after_page_tables = page_dir + (1 + ENTRY_COUNT) * ENTRY_COUNT;
+    void *ptr_after_page_tables = page_dir + (1 + page_dir_length) * ENTRY_COUNT;
     for (void *ptr = 0; ptr < ptr_after_page_tables; ptr += PAGE_SIZE) {
         memory_map_page(ptr, ptr);
     }
 
     enable_paging(page_dir);
 
-    for (uint32 i = (uint32)ptr_after_page_tables; i != 0; i += PAGE_SIZE) {
+    for (uint32 i = ram_size - PAGE_SIZE; i >= (uint32)ptr_after_page_tables; i -= PAGE_SIZE) {
         stack_push(&free_real_mem_stack, i);
     }
 }
@@ -142,12 +177,14 @@ int memory_unmap_page(void* ptr) {
 }
 
 int find_free_pages(int count, void **out) {
+    uint32 page_dir_length = get_page_dir_length();
+
     int found_page_count = 0;
-    for (uint32 i = 0; i < ENTRY_COUNT; i++) {
+    for (uint32 i = 0; i < page_dir_length; i++) {
         for (uint32 j = 0; j < ENTRY_COUNT; j++) {
             void *ptr = (void*)((i << 22) + (j << 12));
             uint32 *page_entry_ptr = get_page_table_entry_ptr(ptr);
-            if (*page_entry_ptr & 1 == 0) {
+            if ((*page_entry_ptr & 1) == 1) {
                 found_page_count = 0;
             }
             else {
@@ -193,4 +230,6 @@ int memory_dealloc_pages(void* ptr, int count) {
         memory_unmap_page(ptr);
         ptr += PAGE_SIZE;
     }
+
+    return 0;
 }

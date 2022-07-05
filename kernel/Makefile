@@ -1,7 +1,7 @@
 include kernel.inc
 
 CC = gcc
-CFLAGS = -m32 -nostdlib -fno-pic -fno-asynchronous-unwind-tables
+CFLAGS = -Wall -m32 -nostdlib -fno-pic -fno-asynchronous-unwind-tables
 
 SOURCES := $(shell find . -type f -name '*.c')
 OBJECTS := $(patsubst %.c,%.o,$(SOURCES))
@@ -16,8 +16,11 @@ kernel.bin: mode16.bin main.bin
 mode16.bin: mode16.o
 	ld -m elf_i386 -Ttext 0 --entry 0 --defsym KERNEL_ENTRYPOINT=$(KERNEL_ENTRYPOINT) --oformat binary -o $@ $<
 
-main.bin: build.ld prot.o $(OBJECTS)
-	ld -m elf_i386 -shared -fno-pie -o $@ -T $^
+main.bin: main.elf
+	objcopy $< -O binary $@
+
+main.elf: build.ld prot.o $(OBJECTS)
+	ld -m elf_i386 -o $@ -T $^
 
 mode16.o: mode16.s ../boot/boot.inc
 	gcc -m16 -nostdlib -c -o $@ $<
@@ -28,8 +31,8 @@ prot.o: prot.s
 -include $(DEPENDS)
 
 %.o: %.c Makefile
-	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
+	$(CC) $(CFLAGS) -MMD -MP -g -c $< -o $@
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJECT) $(DEPENDS) *.bin
+	rm -rf $(OBJECTS) $(DEPENDS) *.bin
