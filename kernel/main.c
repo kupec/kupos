@@ -12,8 +12,8 @@ void kernel_main() {
     char ram_size_s[10];
     num_to_str(ram_size / 1024 / 1024, 10, ram_size_s);
     char buffer[80];
-    strcat("Memory size = ", ram_size_s, 80, buffer);
-    strcat(buffer, " MB", 80, buffer);
+    str_cat("Memory size = ", ram_size_s, 80, buffer);
+    str_cat(buffer, " MB", 80, buffer);
     console_print_line(buffer);
 
     console_print_line("Trying to allocate memory...");

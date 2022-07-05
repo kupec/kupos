@@ -1,7 +1,7 @@
 include kernel.inc
 
 CC = gcc
-CFLAGS = -Wall -m32 -nostdlib -fno-pic -fno-asynchronous-unwind-tables
+CFLAGS = -Werror -m32 -nostdlib -fno-pic -fno-asynchronous-unwind-tables
 
 SOURCES := $(shell find . -type f -name '*.c')
 OBJECTS := $(patsubst %.c,%.o,$(SOURCES))

@@ -1,5 +1,5 @@
 #include "console.h"
-#include "string.h"
+#include "string/string.h"
 #include "math.h"
 #include "asm/io.h"
 
@@ -80,7 +80,7 @@ void console_print_line(char* s) {
         next_buffer[i - start_pos] = current_buffer[i];
     } 
 
-    int len = min(strlen(s), PAGE_WIDTH - col);
+    int len = min(str_len(s), PAGE_WIDTH - col);
     int cursor = row * PAGE_WIDTH + col;
 
     for (int i = 0; i < len; i++) {
