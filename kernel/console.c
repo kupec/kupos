@@ -90,3 +90,14 @@ void console_print_line(char* s) {
     console_select_page(next_page);
     console_set_cursor(row + 1, 0);
 }
+
+void console_print_line_f(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+
+    char s[80];
+    vformat(fmt, LEN(s), s, args);
+    console_print_line(s);
+
+    va_end(args);
+}
