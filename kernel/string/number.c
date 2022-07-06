@@ -24,7 +24,7 @@ int num_to_str(uint32 num, uint32 base, uint32 max_length, char* result) {
         return E_SIZE_EXCEED;
     }
 
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length - 1; i++) {
         result[length - 2 - i] = digit_to_char(digits[i]);
     }
     result[length - 1] = 0;
