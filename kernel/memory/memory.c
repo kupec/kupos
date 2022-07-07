@@ -116,16 +116,16 @@ void detect_ram_size() {
     uint32 max = 0xFFFFFFFF - (sizeof(uint32) - 1);
 
     while (max - min >= sizeof(uint32)) {
-        uint32* c = min + (max - min) / 2;
+        uint32* c = (uint32*)(min + (max - min) / 2);
 
         uint32 old = *c;
         uint32 new = old ^ 0xFFFFFFFF;
         *c = new;
         if (*c == new) {
-            min = c;
+            min = (uint32)c;
         }
         else {
-            max = c;
+            max = (uint32)c;
         }
 
         *c = old;
