@@ -2,23 +2,26 @@
 #include "memory/memory.h"
 #include "string/number.h"
 #include "string/string.h"
+#include "string/format.h"
 
 void kernel_main() {
-    console_print_line("Protected mode initialized");
+    FileDescriptor stdout = console_create_fd();
+
+    fd_format(stdout, "Protected mode initialized");
 
     memory_init();
-    console_print_line("Memory paging on");
+    fd_format(stdout, "Memory paging on");
 
-    console_print_line_f("Memory size = %d MB", ram_size / 1024 / 1024);
+    fd_format(stdout, "Memory size = %d MB", ram_size / 1024 / 1024);
 
-    console_print_line("Trying to allocate memory...");
+    fd_format(stdout, "Trying to allocate memory...");
     uint32 *ptr;
     if (memory_alloc_pages(1, (void*)&ptr) < 0) {
-        console_print_line("Cannot allocate");
+        fd_format(stdout, "Cannot allocate");
     }
     else {
-        console_print_line_f("Allocated at 0x%x", ptr);
-        console_print_line("Trying to access page");
+        fd_format(stdout, "Allocated at 0x%x", ptr);
+        fd_format(stdout, "Trying to access page");
 
         int mem_ok = 1;
         for (int i = 0; i < 1024; i++) {
@@ -29,7 +32,7 @@ void kernel_main() {
             }
         }
 
-        console_print_line(mem_ok ? "Good" : "Bad");
+        fd_format(stdout, mem_ok ? "Good" : "Bad");
     }
 
     for (;;);

@@ -101,3 +101,19 @@ void console_print_line_f(const char* fmt, ...) {
 
     va_end(args);
 }
+
+int console_fd_write(void *data) {
+    struct ServiceWriteData* writeData = (struct ServiceWriteData*)data;
+    console_print_line(writeData->buffer);
+    return E_OK;
+}
+
+Operation fd_operations[] = {
+    console_fd_write
+};
+
+FileDescriptor console_fd = {0, fd_operations, LEN(fd_operations)};
+
+FileDescriptor console_create_fd() {
+    return console_fd;
+}
