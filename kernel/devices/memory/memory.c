@@ -1,6 +1,6 @@
 #include "memory.h"
-#include "../types/types.h"
-#include "../asm/int.h"
+#include "../../types/types.h"
+#include "../../asm/int.h"
 
 extern uint32 KERNEL_ENTRYPOINT;
 extern uint32 KERNEL_SIZE;

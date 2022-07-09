@@ -35,4 +35,4 @@ prot.o: prot.s
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJECTS) $(DEPENDS) *.bin
+	rm -rf $(OBJECTS) $(DEPENDS) *.bin *.elf *.o

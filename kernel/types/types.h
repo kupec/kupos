@@ -1,3 +1,7 @@
+#pragma once
+
+#include "./error.h"
+
 typedef unsigned int uint;
 typedef unsigned char uint8;
 typedef signed char int8;

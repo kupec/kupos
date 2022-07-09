@@ -1,5 +1,5 @@
 #include "number.h"
-#include "../error.h"
+#include "../types/error.h"
 
 #define MAX_UINT32_DIGITS 10
 

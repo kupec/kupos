@@ -1,4 +1,6 @@
-#include "../types/types.h"
+#pragma once
+
+#include "../../types/types.h"
 
 extern uint32 ram_size;
 

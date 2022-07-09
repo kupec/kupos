@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../types/types.h"
 
 int num_to_str(uint32, uint32, uint32, char*);
