@@ -5,6 +5,7 @@
 #include "std/format.h"
 
 void kernel_main() {
+    console_init();
     FileDescriptor stdout = console_create_fd();
 
     fd_format(stdout, "Protected mode initialized");
