@@ -1,5 +1,7 @@
-#include "types/types.h"
-#include "fd/interface.h"
+#pragma once
+
+#include "../../types/types.h"
+#include "../../fd/interface.h"
 
 FileDescriptor console_create_fd();
 void console_print_line(char* s);

@@ -1,8 +1,8 @@
-#include "console.h"
-#include "memory/memory.h"
-#include "string/number.h"
-#include "string/string.h"
-#include "string/format.h"
+#include "devices/console/console.h"
+#include "devices/memory/memory.h"
+#include "std/number.h"
+#include "std/string.h"
+#include "std/format.h"
 
 void kernel_main() {
     FileDescriptor stdout = console_create_fd();

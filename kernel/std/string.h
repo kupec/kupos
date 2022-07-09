@@ -1,5 +1,7 @@
+#pragma once
+
 #include "../types/types.h"
-#include "../error.h"
+#include "../types/error.h"
 #include <stdarg.h>
 
 #define LEN(x) (sizeof x / sizeof x[0])

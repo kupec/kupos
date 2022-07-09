@@ -1,7 +1,7 @@
 #include "console.h"
-#include "string/string.h"
-#include "math.h"
-#include "asm/io.h"
+#include "../../std/string.h"
+#include "../../std/math.h"
+#include "../../asm/io.h"
 
 #define PAGE_WIDTH 80
 #define PAGE_HEIGHT 25

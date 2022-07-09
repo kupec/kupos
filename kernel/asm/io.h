@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../types/types.h"
 
 #define WORD(hi, lo) ( ((uint8)(hi) << 8 ) + (uint8)(lo) )

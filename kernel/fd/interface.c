@@ -1,5 +1,5 @@
 #include "interface.h"
-#include "../error.h"
+#include "../types/error.h"
 
 int fd_write(FileDescriptor fd, uint32 count, void* buffer) {
     if (SERVICE_WRITE >= fd.count) {
