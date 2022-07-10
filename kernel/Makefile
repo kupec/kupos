@@ -19,13 +19,16 @@ mode16.bin: mode16.o
 main.bin: main.elf
 	objcopy $< -O binary $@
 
-main.elf: build.ld prot.o $(OBJECTS)
+main.elf: build.ld prot.o int.o $(OBJECTS)
 	ld -m elf_i386 -o $@ -T $^
 
 mode16.o: mode16.s ../boot/boot.inc
 	gcc -m16 -nostdlib -c -o $@ $<
 
 prot.o: prot.s
+	gcc -m32 -nostdlib -c -o $@ $<
+
+int.o: int.s
 	gcc -m32 -nostdlib -c -o $@ $<
 
 -include $(DEPENDS)

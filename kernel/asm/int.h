@@ -2,4 +2,5 @@
 
 void cli();
 void sti();
+void hlt();
 

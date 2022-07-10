@@ -1,8 +1,11 @@
 #include "devices/console/console.h"
 #include "devices/memory/memory.h"
+#include "devices/interrupts/interrupts.h"
+#include "devices/timer/timer.h"
 #include "std/number.h"
 #include "std/string.h"
 #include "std/format.h"
+#include "asm/int.h"
 
 void kernel_main() {
     console_init();
@@ -12,8 +15,10 @@ void kernel_main() {
 
     memory_init();
     fd_format(stdout, "Memory paging on");
-
     fd_format(stdout, "Memory size = %d MB", ram_size / 1024 / 1024);
+
+    interrupts_init();
+    fd_format(stdout, "Interrupts on");
 
     fd_format(stdout, "Trying to allocate memory...");
     uint32 *ptr;
@@ -36,5 +41,14 @@ void kernel_main() {
         fd_format(stdout, mem_ok ? "Good" : "Bad");
     }
 
-    for (;;);
+    int sleep_count = 10;
+    fd_format(stdout, "Wait for %d seconds", sleep_count);
+    for (int i = 0; i < sleep_count; i++) {
+        sleep(1000);
+        fd_format(stdout, "%d seconds elapsed", i+1);
+    }
+
+    for (;;) {
+        hlt();
+    }
 }

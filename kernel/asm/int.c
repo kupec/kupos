@@ -12,3 +12,6 @@ void sti() {
     }
 }
 
+void hlt() {
+    __asm__ volatile ("hlt");
+}
