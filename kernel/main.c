@@ -21,7 +21,7 @@ void kernel_main() {
     fd_format(stdout, "Interrupts on");
 
     fd_format(stdout, "Trying to allocate memory...");
-    uint32 *ptr;
+    volatile uint32 *ptr;
     if (memory_alloc_pages(1, (void*)&ptr) < 0) {
         fd_format(stdout, "Cannot allocate");
     }

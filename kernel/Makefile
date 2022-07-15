@@ -1,6 +1,6 @@
 include kernel.inc
 
-CC = gcc
+CC = clang
 CFLAGS = -Werror -m32 -nostdlib -fno-pic -fno-asynchronous-unwind-tables
 
 SOURCES := $(shell find . -type f -name '*.c')
