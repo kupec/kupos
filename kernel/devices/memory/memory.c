@@ -116,7 +116,7 @@ void detect_ram_size() {
     uint32 max = 0xFFFFFFFF - (sizeof(uint32) - 1);
 
     while (max - min >= sizeof(uint32)) {
-        uint32* c = (uint32*)(min + (max - min) / 2);
+        volatile uint32* c = (uint32*)(min + (max - min) / 2);
 
         uint32 old = *c;
         uint32 new = old ^ 0xFFFFFFFF;

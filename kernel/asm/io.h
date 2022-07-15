@@ -9,6 +9,7 @@ static void outb(uint16 port, uint8 value) {
         "movw %h0, %%dx\n\t"
         "outb %%al, %%dx\n\t"
         :: "irm" (port), "a" (value)
+        : "edx"
     );
 }
 
@@ -19,6 +20,7 @@ static uint8 inb(uint16 port) {
         "inb %%dx, %%al\n\t"
         : "=a" (value)
         : "irm" (port)
+        : "edx"
     );
     return value;
 }
