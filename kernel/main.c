@@ -2,6 +2,7 @@
 #include "devices/memory/memory.h"
 #include "devices/interrupts/interrupts.h"
 #include "devices/timer/timer.h"
+#include "devices/pci/pci.h"
 #include "std/number.h"
 #include "std/string.h"
 #include "std/format.h"
@@ -41,12 +42,18 @@ void kernel_main() {
         fd_format(stdout, mem_ok ? "Good" : "Bad");
     }
 
-    int sleep_count = 10;
-    fd_format(stdout, "Wait for %d seconds", sleep_count);
-    for (int i = 0; i < sleep_count; i++) {
-        sleep(1000);
-        fd_format(stdout, "%d seconds elapsed", i+1);
+    fd_format(stdout, "Enumerating PCI devices...");
+    PciSearch pci_search;
+    pci_search_init(&pci_search);
+    PciDevice pci_device;
+    while (pci_search_next(&pci_search, &pci_device)) {
+        if (pci_search.func == 0) {
+            fd_format(stdout, "- %d.%d VEN=%x DEV=%x CLASS=%x(%s) SUBCLS=%x HDR=%x", pci_search.bus, pci_search.device, pci_device.vendor_id, pci_device.device_id, pci_device.class_code, PCI_CLASSES[pci_device.class_code], pci_device.subclass, pci_device.header_type);
+        } else {
+            fd_format(stdout, "  - FUNC=%x DEV=%x CLASS=%x(%s) SUBCLS=%x", pci_search.func, pci_device.device_id, pci_device.class_code, PCI_CLASSES[pci_device.class_code], pci_device.subclass);
+        }
     }
+    fd_format(stdout, "Done");
 
     for (;;) {
         hlt();
