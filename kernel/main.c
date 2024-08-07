@@ -3,6 +3,7 @@
 #include "devices/interrupts/interrupts.h"
 #include "devices/timer/timer.h"
 #include "devices/pci/pci.h"
+#include "devices/disk/ata.h"
 #include "std/number.h"
 #include "std/string.h"
 #include "std/format.h"
@@ -54,6 +55,19 @@ void kernel_main() {
         }
     }
     fd_format(stdout, "Done");
+
+    uint16 ata_info[256];
+    ata_init(ata_info);
+    fd_format(stdout, "Found ATA/IDE drive");
+    int max_sectors = *(uint32*)(ata_info+60);
+    fd_format(stdout, "- sectors=%d volume=%d MB", ata_info[60], ata_info[61]);
+    char s[80];
+    ata_convert_ascii(ata_info+10, 20, s);
+    fd_format(stdout, "- serial number = %s", s);
+    ata_convert_ascii(ata_info+23, 8, s);
+    fd_format(stdout, "- firmware revision = %s", s);
+    ata_convert_ascii(ata_info+27, 40, s);
+    fd_format(stdout, "- model number = %s", s);
 
     for (;;) {
         hlt();

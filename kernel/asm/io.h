@@ -13,6 +13,15 @@ static void outb(uint16 port, uint8 value) {
     );
 }
 
+static void outw(uint16 port, uint16 value) {
+    __asm__ volatile (
+        "movw %h0, %%dx\n\t"
+        "outw %%ax, %%dx\n\t"
+        :: "irm" (port), "a" (value)
+        : "edx"
+    );
+}
+
 static void outl(uint16 port, uint32 value) {
     __asm__ volatile (
         "movw %h0, %%dx\n\t"
@@ -34,6 +43,18 @@ static uint8 inb(uint16 port) {
     return value;
 }
 
+static uint16 inw(uint16 port) {
+    uint16 value;
+    __asm__ volatile (
+        "movw %h1, %%dx\n\t"
+        "inw %%dx, %%ax\n\t"
+        : "=a" (value)
+        : "irm" (port)
+        : "edx"
+    );
+    return value;
+}
+
 static uint32 inl(uint16 port) {
     uint32 value;
     __asm__ volatile (
@@ -44,4 +65,13 @@ static uint32 inl(uint16 port) {
         : "edx"
     );
     return value;
+}
+
+static void insw(uint16 port, void* buf, uint32 word_count) {
+    __asm__ volatile (
+        "cld\n\t"
+        "rep insw\n\t"
+        : "+D" (buf), "+c" (word_count)
+        : "d" (port)
+    );
 }
