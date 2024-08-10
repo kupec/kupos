@@ -4,7 +4,7 @@
 void print_hex(FileDescriptor fd, const char* title, void* buf, int count) {
     fd_format(fd, "Dump of %s:", title);
     for (int r = 0; r < count / 0x10; r++) {
-        char* p = buf + r * 0x10;
+        unsigned char* p = buf + r * 0x10;
         fd_format(
             fd,
             "%2x: %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x",

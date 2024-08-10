@@ -20,10 +20,9 @@
 
 #define DRIVE_SHIFT 4
 #define DRIVE_MASK (1 << DRIVE_SHIFT)
-#define DRIVE_MASTER 0
-#define DRIVE_SLAVE 1
 
 #define CMD_IDENTIFY 0xEC
+#define CMD_READ_SECTORS 0x21
 
 #define SECTOR_SIZE 0x200
 
@@ -60,10 +59,11 @@ void read_block(void *buffer) {
     insw(reg(DATA_REG), buffer, SECTOR_SIZE/2);
 }
 
-void ata_init(void *buffer) {
+void ata_init(int drive, void *buffer) {
     wait_for_drive_ready();
+    wait_for_not_busy();
 
-    select_drive(DRIVE_MASTER);
+    select_drive(drive);
     execute_command(CMD_IDENTIFY);
     read_block(buffer);
 }
@@ -76,4 +76,25 @@ void ata_convert_ascii(const void* input, int len, char* output) {
         *output++ = lo;
     }
     *output = 0;
+}
+
+void set_lba(int drive, uint32 lba) {
+    outb(reg(DRIVE_HEAD_REG), (lba >> 24 & 0x0F | (0xE0 + (drive << 4))));
+    outb(reg(CYLINDER_HI_REG), (lba >> 16) & 0xFF);
+    outb(reg(CYLINDER_LO_REG), (lba >> 8) & 0xFF);
+    outb(reg(SECTOR_NUMBER_REG), lba & 0xFF);
+}
+
+void ata_read_sectors(int drive, uint32 lba, uint8 sector_count, void* buf) {
+    wait_for_not_busy();
+
+    select_drive(drive);
+    set_lba(drive, lba);
+    outb(reg(SECTOR_COUNT_REG), sector_count);
+
+    execute_command(CMD_READ_SECTORS);
+    while (sector_count--) {
+        read_block(buf);
+        buf += SECTOR_SIZE;
+    }
 }

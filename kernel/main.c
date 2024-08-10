@@ -58,7 +58,7 @@ void kernel_main() {
     fd_format(stdout, "Done");
 
     uint16 ata_info[256];
-    ata_init(ata_info);
+    ata_init(ATA_DRIVE_MASTER, ata_info);
     fd_format(stdout, "Found ATA/IDE drive");
     int max_sectors = *(uint32*)(ata_info+60);
     fd_format(stdout, "- sectors=%d volume=%d MB", ata_info[60], ata_info[61]);
@@ -69,11 +69,13 @@ void kernel_main() {
     fd_format(stdout, "- firmware revision = %s", s);
     ata_convert_ascii(ata_info+27, 40, s);
     fd_format(stdout, "- model number = %s", s);
-
     print_hex(stdout, "ATA identify", ata_info, 0x40);
 
-    //char *sector_buf[512];
-    //ata_read_sector(0, 0, sector_buf);
+    char* sector_buf;
+    memory_alloc_pages(1, (void*)&sector_buf);
+    ata_read_sectors(ATA_DRIVE_MASTER, 0, 1, sector_buf);
+    print_hex(stdout, "Boot sector", sector_buf, 0x20);
+    memory_dealloc_pages(sector_buf, 1);
 
     for (;;) {
         hlt();
