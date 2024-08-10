@@ -1,4 +1,4 @@
-target remote 192.168.0.70:1234
+target remote 192.168.1.70:1234
 
 define real_mode
     break *0x7c00

@@ -70,11 +70,20 @@ int vformat(const char *fmt, uint32 max_length, char* result, va_list args) {
             continue;
         }
 
-        ch = *fmt++;
+        int padding = 0;
+        while (true) {
+            ch = *fmt++;
+            if (ch < '0' || ch > '9') {
+                break;
+            }
+
+            padding = padding * 10 + ch - '0';
+        }
+
         if (ch == 'd' || ch == 'x') {
             int num = va_arg(args, int);
             char s[10];
-            inum_to_str(num, ch == 'd' ? 10 : 16, LEN(s), s);
+            inum_to_str(num, ch == 'd' ? 10 : 16, padding, LEN(s), s);
             int res = append_str(s, &max_length, &result);
             if (res < 0) {
                 return res;

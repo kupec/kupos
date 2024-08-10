@@ -7,6 +7,7 @@
 #include "std/number.h"
 #include "std/string.h"
 #include "std/format.h"
+#include "debug/dump.h"
 #include "asm/int.h"
 
 void kernel_main() {
@@ -68,6 +69,11 @@ void kernel_main() {
     fd_format(stdout, "- firmware revision = %s", s);
     ata_convert_ascii(ata_info+27, 40, s);
     fd_format(stdout, "- model number = %s", s);
+
+    print_hex(stdout, "ATA identify", ata_info, 0x40);
+
+    //char *sector_buf[512];
+    //ata_read_sector(0, 0, sector_buf);
 
     for (;;) {
         hlt();
