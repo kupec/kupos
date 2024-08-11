@@ -2,12 +2,12 @@
 #include "../std/format.h"
 
 void print_hex(FileDescriptor fd, const char* title, void* buf, int count) {
-    fd_format(fd, "Dump of %s:", title);
+    fd_format(fd, "Dump of %s:\n", title);
     for (int r = 0; r < count / 0x10; r++) {
         unsigned char* p = buf + r * 0x10;
         fd_format(
             fd,
-            "%2x: %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x",
+            "%2x: %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x\n",
             r * 0x10,
             p[0], p[1], p[2], p[3],
             p[4], p[5], p[6], p[7],

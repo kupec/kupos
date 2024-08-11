@@ -7,6 +7,6 @@ int fd_write(FileDescriptor fd, uint32 count, void* buffer) {
     }
 
     Operation operation = fd.operations[SERVICE_WRITE];
-    struct ServiceWriteData data = {count, buffer};
+    struct ServiceWriteData data = {fd.state, count, buffer};
     return operation(&data);
 }

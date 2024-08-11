@@ -21,7 +21,7 @@ int str_cat(const char* s1, const char* s2, uint32 max_length, char* result) {
     for (int i = 0; i < l1; i++) {
         result[i] = s1[i];
     }
-    for (int i = 0; i < l1; i++) {
+    for (int i = 0; i < l2; i++) {
         result[l1 + i] = s2[i];
     }
     result[l1+l2] = 0;

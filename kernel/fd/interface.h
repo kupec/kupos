@@ -13,6 +13,7 @@ typedef struct _FileDescriptor {
 } FileDescriptor;
 
 struct ServiceWriteData {
+    void* state;
     uint32 count;
     void* buffer;
 };

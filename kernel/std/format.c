@@ -15,7 +15,7 @@ int fd_format(FileDescriptor fd, const char* fmt, ...) {
         return result;
     }
 
-    fd_write(fd, LEN(s), s);
+    fd_write(fd, str_len(s), s);
     if (result < 0) {
         return result;
     }
