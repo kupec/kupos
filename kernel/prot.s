@@ -6,6 +6,6 @@ kernel_entry:
 	movw %ax, %ds
 	movw %ax, %es
 	movw %ax, %ss
-	movl $kernel_entry, %esp
+	movl $KERNEL_START, %esp
 
 	jmp kernel_main
